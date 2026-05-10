@@ -1,7 +1,7 @@
 # Claude Interaction Preferences
 # Author: David Baker
-# Version: 1.3 — May 7, 2026
-# Deprecates: preferences-current.md (v1.2 — May 6, 2026)
+# Version: 1.3.1 — May 10, 2026
+# Deprecates: preferences-current.md (v1.3 — May 7, 2026)
 # Purpose: Master reference document for Claude behavior across all sessions.
 # This document contains no sensitive or identifying information.
 # Host at: https://raw.githubusercontent.com/davidkbaker/david-claude-prefs/main/preferences-current.md
@@ -328,4 +328,4 @@ Expect: green checkmarks confirming setup is correct.
 ---
 
 *This document is machine-readable and publicly hosted. It contains no sensitive data.
-Last updated: May 7, 2026. Version 1.3. Deprecates v1.2 (May 6, 2026).*
+Last updated: May 10, 2026. Version 1.3.1. Deprecates v1.3 (May 7, 2026).*
