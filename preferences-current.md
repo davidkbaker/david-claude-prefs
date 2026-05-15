@@ -1,7 +1,7 @@
 # Claude Interaction Preferences
 # Author: David Baker
-# Version: 1.5 — May 14, 2026
-# Deprecates: preferences-current.md (v1.4 — May 11, 2026)
+# Version: 1.6 — May 15, 2026
+# Deprecates: preferences-current.md (v1.5 — May 14, 2026)
 # Purpose: Master reference document for Claude behavior across all sessions.
 # This document contains no sensitive data.
 # Host at: https://raw.githubusercontent.com/davidkbaker/david-claude-prefs/main/preferences-current.md
@@ -103,7 +103,7 @@ Before starting any platform build task, explicitly verify:
 ### When User Says "Add to Preferences" or "Update Preferences"
 1. Confirm what the user wants to add/change
 2. Confirm they want to update the master doc (not just apply for this session)
-3. Generate a new dated preferences file with a versioned filename (e.g. preferences-current-v1.5-20260514.md)
+3. Generate a new dated preferences file with a versioned filename (e.g. preferences-current-v1.6-20260515.md)
 4. Mark it as deprecating the prior version at the top
 5. Provide the file for download
 6. Provide the complete Claude Code push prompt below — no placeholders
@@ -130,6 +130,12 @@ Expect: commit confirmation and `main -> main`.
 
 ## PACKAGING AND TRANSFER
 
+### Pre-Transfer Checklist — ALWAYS run before packaging
+1. Fetch latest preferences from https://david-baker-prefs.vercel.app/api/david-baker-llm-preferences
+2. Confirm version received — note it in session notes and CHANGELOG
+3. If a newer version exists than what was loaded at session start, note any new rules that apply
+4. Then proceed with packaging
+
 ### Transfer Command
 When the user says "transfer," produce two zips.
 If nothing meaningful was generated in the session, say so and skip.
@@ -137,7 +143,8 @@ If nothing meaningful was generated in the session, say so and skip.
 **Context zip** (always under 10MB — upload this to continue in a new thread):
 - CHANGELOG.md — source of truth, append-only, never overwrite
 - README.md — includes confidentiality/ownership header: "All content © David Baker. Do not share or distribute."
-- Session notes file
+- Session notes file — current session
+- ALL prior session notes files — carried forward from the previous zip (cumulative — never drop)
 - LEARNINGS.md — reusable operational lessons, updated every session (see below)
 - BACKLOG.md — scrum-style backlog, updated every session
 - MANIFEST.md — lists every file by name and which zip it lives in
@@ -153,6 +160,16 @@ Rules:
 - BACKLOG.md is always included and always updated — never skip it
 - Implemented backlog items are removed from BACKLOG.md and noted in CHANGELOG.md
 - Items that are v1-implemented with v2 planned stay in BACKLOG.md marked as "v1 complete, v2 planned"
+- Session notes are CUMULATIVE — every prior session notes file must be carried forward into the new zip
+  so the zip is always self-contained and any thread can reconstruct full history from a single upload
+
+### Project UID Convention
+- A project UID identifies a project, not a session. Example: BKR-LEGAL-001
+- The UID remains constant for the entire life of the project across all sessions and threads
+- Session identity is conveyed by the date-stamped zip filename and session notes filename
+- Increment the UID only when starting a genuinely new, separate project
+- Current active projects:
+  - BKR-LEGAL-001 — Baker co-parenting legal documentation platform (baker-legal.vercel.app)
 
 ### LEARNINGS.md Protocol
 - Maintained as a living document across all sessions
@@ -167,7 +184,7 @@ When a context zip is uploaded:
 1. Read README first
 2. Read CHANGELOG — treat as source of truth
 3. Read LEARNINGS.md — required before any platform build work
-4. Read session notes
+4. Read session notes — most recent first, then prior sessions for context
 5. State understanding of each active workstream
 6. Ask which workstream and task to start with
 7. Do NOT begin building or drafting anything until asked
@@ -604,60 +621,37 @@ Expect: green checkmarks confirming setup is correct.
 ## PREFERENCES BACKLOG
 
 Planned additions and improvements. Captured here so any thread can pick up where another left off.
-Items marked IMPLEMENTED are retained for one version then removed. Items with v2 planned are retained.
-
-### PREF-001 — Voice and Writing Model
-Status: IMPLEMENTED v2.0 in v1.5
-Description: David's personal voice and writing style model (v2.0, May 14 2026) incorporated as
-the DAVID BAKER — WRITING VOICE MODEL section above. Applied to all drafting work across all threads.
-v2 planned: ongoing refinement as new reference samples are added and modes are extended.
+Items marked IMPLEMENTED are retained for one version then removed.
 
 ### PREF-002 — Preferences Repo Auth
 Status: v1 COMPLETE — private GitHub repo + read-only PAT; v2 planned
-Description: The david-claude-prefs GitHub repo should be made private. A read-only Personal Access
-Token (PAT) is embedded in the fetch URL used by the Vercel endpoint, so only the endpoint can
-retrieve the file. The URL itself acts as the key — anyone without the PAT gets a 404.
-v1 implementation: make repo private at github.com/davidkbaker/david-claude-prefs → Settings →
-Change visibility → Private. Generate a read-only PAT at github.com/settings/tokens with `contents:read`
-scope. Update the Vercel endpoint's GITHUB_RAW_URL to:
-`https://YOUR_PAT@raw.githubusercontent.com/davidkbaker/david-claude-prefs/main/preferences-current.md`
-Redeploy Vercel after updating the env var.
+Description: The david-claude-prefs GitHub repo is private. A read-only Personal Access Token (PAT)
+is embedded in the fetch URL used by the Vercel endpoint, so only the endpoint can retrieve the file.
+v1 implementation: make repo private → generate read-only PAT with `contents:read` scope → update
+Vercel endpoint's GITHUB_RAW_URL → redeploy Vercel.
 v2 planned: email alerts when an unrecognized source pulls from the endpoint (see PREF-007).
 
 ### PREF-003 — Multi-LLM Portability Testing
 Status: Backlog
-Description: The preferences endpoint is designed to be LLM-agnostic. Test pointing other LLMs
-(ChatGPT, Gemini, Grok, etc.) at the endpoint and document what works, what doesn't, and what
-sections need annotation or rewriting to be useful outside of Claude.
+Description: Test pointing other LLMs (ChatGPT, Gemini, Grok) at the endpoint and document what
+works, what doesn't, and what sections need annotation for non-Claude LLMs.
 Next step: Test with one other LLM when convenient.
 
 ### PREF-004 — Cloudflare Worker Alternative to Vercel
-Status: Backlog (suggestion only, not imperative)
-Description: A Cloudflare Worker could replace the Vercel preferences endpoint — lighter,
-free tier, no project overhead. Only worth pursuing if Vercel causes issues.
+Status: Backlog (suggestion only)
+Description: A Cloudflare Worker could replace the Vercel preferences endpoint — lighter, free tier.
 Next step: No action unless Vercel proves problematic.
 
 ### PREF-005 — Preferences Version Status Page
 Status: Idea
-Description: A simple page at david-baker-prefs.vercel.app showing current version, last updated
-date, and recent changelog entries.
+Description: A simple page at david-baker-prefs.vercel.app showing current version and last updated date.
 Next step: Low priority.
-
-### PREF-006 — Always Specify Terminal vs Claude Code
-Status: IMPLEMENTED in v1.4
-Description: Rule added to Core Interaction Rules and Task Execution sections. Retained this version,
-removed next.
 
 ### PREF-007 — Access Logging and Email Alerts
 Status: Backlog
-Description: Log every fetch from the preferences endpoint with timestamp, IP address, and a
-request identifier. Send an email alert when a fetch comes from an unrecognized source or IP.
-Implementation options: Supabase table for log storage + Resend or SendGrid for email delivery,
-triggered by the Vercel endpoint on each request.
-Note: Low urgency while only writing voice data is the sensitive content. Revisit when cross-project
-data (F-14) is live, since that may carry more sensitive context.
-Next step: Design the logging schema before building. Decide alert threshold (every unknown IP vs
-daily digest).
+Description: Log every fetch from the preferences endpoint with timestamp and IP. Send email alert
+when fetch comes from unrecognized source. Options: Supabase table + Resend/SendGrid.
+Next step: Design logging schema before building. Low urgency while only voice data is sensitive.
 
 ### F-14 — Cross-Project Reference System
 Status: Backlog — designed, not yet built
@@ -665,36 +659,11 @@ Description: A system for cross-project context retrieval so any Claude thread c
 state of any active project without uploading a zip.
 
 Architecture:
-- A private GitHub repo (separate from preferences) contains one folder per project
+- A private GitHub repo contains one folder per project
 - Each folder contains the latest extracted context files (CHANGELOG.md, session notes, BACKLOG.md)
-- A PROJECT-REGISTRY.md file in the preferences repo lists every project UID, its folder path,
-  its repo location, and a one-line description
-- At session start or on request, Claude fetches the registry and can retrieve context from any
-  project by UID
-- Transfer command is extended to push context files to the project folder automatically
-  (one-line git push addition to the existing transfer workflow)
-
-Access control:
-- Project repo is private
-- Read-only PAT embedded in fetch URL (same pattern as PREF-002)
-- PAT is stored as a Vercel env var, not in any committed file
-
-Sensitive data protection:
-- Pre-commit hook on the Mac scans for sensitive patterns before any push is allowed
-- Hook blocks the commit if flagged content is detected
-- Pattern list is maintained in a config file in the repo
-
-Email alerts:
-- Every fetch from the project registry or project folders is logged (see PREF-007)
-- Alert sent if fetch originates from unrecognized source
-
-Implementation sequence when ready:
-1. Create private GitHub repo for project context
-2. Create PROJECT-REGISTRY.md in preferences repo
-3. Update transfer command to push to project folder
-4. Set up pre-commit hook for sensitive data scanning
-5. Add access logging to Vercel endpoint (shared with PREF-007)
-6. Test end-to-end with BKR-LEGAL-001
+- A PROJECT-REGISTRY.md in the preferences repo lists every project UID, folder path, and description
+- At session start or on request, Claude fetches the registry and retrieves context from any project by UID
+- Transfer command extended to push context files to the project folder automatically
 
 Current project UIDs:
 - BKR-LEGAL-001 — Baker co-parenting legal documentation platform (baker-legal.vercel.app)
@@ -705,4 +674,4 @@ Next step: Confirm project repo naming convention and registry format before bui
 
 *This document is machine-readable. It contains voice model data and personal workflow preferences.
 The GitHub source repo is private. The Vercel endpoint is the only authorized access point.
-Last updated: May 14, 2026. Version 1.5. Deprecates v1.4 (May 11, 2026).*
+Last updated: May 15, 2026. Version 1.6. Deprecates v1.5 (May 14, 2026).*
